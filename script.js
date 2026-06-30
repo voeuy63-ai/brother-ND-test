@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhost:5000"; // Change this to your deployed backend url
+const API_BASE_URL = "https://backend-11zq.onrender.com"; // Change this to your deployed backend url
 
 const TELEGRAM_BOT_TOKEN = "8998859713:AAFOvcttVnqZip52L3dhtPFvWFaTrgQ4TGY";
 const TELEGRAM_CHAT_ID = "-1004495647556"; 
