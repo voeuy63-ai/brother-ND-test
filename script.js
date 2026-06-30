@@ -1,10 +1,9 @@
-const API_BASE_URL = "https://backend-11zq.onrender.com"; // Change this to your deployed backend url
+const API_BASE_URL = "http://localhost:5000"; // Change this to your deployed backend url
 
 const TELEGRAM_BOT_TOKEN = "8998859713:AAFOvcttVnqZip52L3dhtPFvWFaTrgQ4TGY";
 const TELEGRAM_CHAT_ID = "-1004495647556"; 
 
 let currentOrder = { category: '', value: '', price: 0, ign: '', email: '', platform: '' };
-let countdownInterval = null;
 let statusPollInterval = null;
 
 // Page Navigation Function
@@ -85,16 +84,13 @@ async function confirmAndPay() {
             qrBox.innerHTML = "";
             new QRCode(qrBox, {
                 text: result.khqr_string,
-                width: 220, 
-                height: 220,
+                width: 150, 
+                height: 150,
                 colorDark : "#000000",
                 colorLight : "#ffffff"
             });
 
-            document.getElementById("qr-timeout-overlay").style.display = "none";
             document.getElementById("paymentModal").style.display = "flex";
-
-            startCountdownTimer(420); // 7 minutes
             startPaymentPolling(result.transaction_id);
 
         } else {
@@ -106,33 +102,6 @@ async function confirmAndPay() {
     }
 }
 
-function startCountdownTimer(durationInSeconds) {
-    if (countdownInterval) clearInterval(countdownInterval);
-    
-    let timer = durationInSeconds;
-    const timerDisplay = document.getElementById('countdown-timer');
-
-    countdownInterval = setInterval(() => {
-        let minutes = parseInt(timer / 60, 10);
-        let seconds = parseInt(timer % 60, 10);
-
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
-        timerDisplay.innerText = `${minutes}:${seconds}`;
-
-        if (--timer < 0) {
-            clearInterval(countdownInterval);
-            clearInterval(statusPollInterval); 
-            
-            const overlay = document.getElementById("qr-timeout-overlay");
-            overlay.style.display = "flex";
-            overlay.innerHTML = "<p style='color:red;font-weight:bold;text-align:center;'>❌ លែងមានសុពលភាព (Expired)!</p>";
-            
-            setTimeout(closeModal, 4000);
-        }
-    }, 1000);
-}
 
 function startPaymentPolling(transactionId) {
     if (statusPollInterval) clearInterval(statusPollInterval);
@@ -143,7 +112,6 @@ function startPaymentPolling(transactionId) {
             const result = await response.json();
 
             if (result.status === "success" && result.order_status === "paid") {
-                clearInterval(countdownInterval);
                 clearInterval(statusPollInterval);
                 
                 document.getElementById("paymentModal").style.display = "none";
@@ -208,6 +176,6 @@ function closeSuccessAlert() {
 
 function closeModal() {
     document.getElementById("paymentModal").style.display = "none";
-    if (countdownInterval) clearInterval(countdownInterval);
     if (statusPollInterval) clearInterval(statusPollInterval);
-}
+                            }
+        
