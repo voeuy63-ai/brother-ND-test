@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Store</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- GLOBAL LOADER -->
+    <div id="global-loader" class="overlay" style="display: none;">
+        <div class="loader"></div>
+        <p style="color:white; margin-top: 15px;">កំពុងដំណើរការ...</p>
+    </div>
+
+    <!-- HOME PAGE -->
+    <div id="page-home" class="page active">
+        <div class="container">
+            <h1 class="title">SERVER STORE</h1>
+            <div class="menu-buttons">
+                <button onclick="showPage('rank-menu')" class="btn primary">1. RANK</button>
+                <button onclick="alert('Benefit Page (Coming Soon)')" class="btn secondary">2. BENEFIT</button>
+                <button onclick="alert('Crate Page (Coming Soon)')" class="btn secondary">3. CRATE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RANK MENU PAGE -->
+    <div id="page-rank-menu" class="page">
+        <div class="container">
+            <h1 class="title">RANK OPTIONS</h1>
+            <div class="menu-buttons">
+                <button onclick="showPage('rank-select')" class="btn primary">Fill in the name</button>
+                <button onclick="alert('Redeem code section')" class="btn secondary">Redeem Code</button>
+                <button onclick="showPage('home')" class="btn back">Back to Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RANK SELECT PAGE -->
+    <div id="page-rank-select" class="page">
+        <div class="container">
+            <h1 class="title">SELECT RANK</h1>
+            <div class="rank-grid">
+                <div class="rank-card" id="card-VIP" onclick="selectItem('rank', 'VIP', 2.00)">
+                    <h3>VIP</h3><p>$2.00</p>
+                </div>
+                <div class="rank-card" id="card-MVP" onclick="selectItem('rank', 'MVP', 4.00)">
+                    <h3>MVP</h3><p>$4.00</p>
+                </div>
+                <div class="rank-card" id="card-MVP+" onclick="selectItem('rank', 'MVP+', 6.00)">
+                    <h3>MVP+</h3><p>$6.00</p>
+                </div>
+                <div class="rank-card" id="card-EPIC" onclick="selectItem('rank', 'EPIC', 8.00)">
+                    <h3>EPIC</h3><p>$8.00</p>
+                </div>
+                <div class="rank-card" id="card-KING" onclick="selectItem('rank', 'KING', 10.00)">
+                    <h3>KING</h3><p>$10.00</p>
+                </div>
+                <div class="rank-card" id="card-NDCLUB" onclick="selectItem('rank', 'NDCLUB', 13.00)">
+                    <h3>NDCLUB</h3><p>$13.00</p>
+                </div>
+            </div>
+            <div class="menu-buttons row">
+                <button onclick="showPage('rank-menu')" class="btn back">Back</button>
+                <button onclick="goToFormStep()" class="btn primary">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORM PAGE -->
+    <div id="page-form" class="page">
+        <div class="container">
+            <h1 class="title">PLAYER INFO</h1>
+            <div class="form-group">
+                <label>User Name</label>
+                <input type="text" id="input-ign" placeholder="Enter your username in game">
+            </div>
+            <div class="form-group">
+                <label>Platform</label>
+                <select id="input-platform">
+                    <option value="Java">Java Edition</option>
+                    <option value="Bedrock">Bedrock Edition</option>
+                </select>
+            </div>
+            <hr>
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="input-email" placeholder="example@gmail.com">
+            </div>
+            <div class="form-group">
+                <label>Promotion Code</label>
+                <input type="text" id="input-promo" placeholder="Optional">
+            </div>
+            <hr>
+            <div class="menu-buttons row">
+                <button onclick="showPage('rank-select')" class="btn back">Back</button>
+                <button onclick="goToCheckoutStep()" class="btn primary">Select Payment (KHQR)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHECKOUT / REVIEW PAGE -->
+    <div id="page-checkout" class="page">
+        <div class="container checkout-box">
+            <h1 class="title">CHECK OUT</h1>
+            <div class="receipt">
+                <p><span>Category:</span> <b id="chk-category">RANK</b></p>
+                <p><span>Item:</span> <b id="chk-item">VIP</b></p>
+                <p><span>Username:</span> <b id="chk-ign">Player123</b></p>
+                <p><span>Platform:</span> <b id="chk-platform">Java</b></p>
+                <p><span>Email:</span> <b id="chk-email">test@test.com</b></p>
+                <hr>
+                <p class="total"><span>Total to Pay:</span> <b id="chk-usd">$2.00</b></p>
+            </div>
+            <div class="menu-buttons row">
+                <button onclick="backToFormStep()" class="btn back">Back</button>
+                <button onclick="confirmAndPay()" class="btn success">Check Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- KHQR PAYMENT MODAL (STYLED LIKE PROVIDED IMAGE) -->
+    <div id="paymentModal" class="overlay" style="display: none;">
+        <div class="khqr-card">
+            <!-- Header -->
+            <div class="khqr-header">
+                <span style="font-weight: 800; font-size: 20px; letter-spacing: 1px;">KH<span style="border: 2px solid white; padding: 0 4px; border-radius: 4px; margin-left: 2px;">QR</span></span>
+            </div>
+            
+            <!-- Body -->
+            <div class="khqr-body">
+                <p class="merchant-name">Server Store</p>
+                <div class="price-display">
+                    <span id="display-khqr-price" class="amount">0.50</span> <span class="currency">USD</span>
+                </div>
+                
+                <div class="dashed-line"></div>
+                
+                <div id="qrcode-box" class="qr-container">
+                    <!-- QR code generated here -->
+                </div>
+                
+                <p class="scan-text">Scan with ABA Mobile, or other<br>Mobile Banking App supporting<br>KHQR</p>
+            </div>
+            
+            <!-- Timer Overlay -->
+            <div id="qr-timeout-overlay" class="qr-timeout" style="display: none;"></div>
+            
+            <p class="timer-text">Expires in: <span id="countdown-timer">07:00</span></p>
+            <button onclick="closeModal()" class="btn back" style="margin-top:10px; width:100%;">Cancel Payment</button>
+        </div>
+    </div>
+
+    <!-- SUCCESS ALERT MODAL -->
+    <div id="successAlert" class="overlay alert-overlay" style="display: none;">
+        <div class="alert-box">
+            <div class="icon-success">✔️</div>
+            <h2>Payment Success!</h2>
+            <p>Your rank will be delivered shortly via RECON.</p>
+            <button onclick="closeSuccessAlert()" class="btn primary">Close</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
