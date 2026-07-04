@@ -3,178 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forest SMP Store</title>
+    <title>Plugin Stock Management - AHNAJAK-CODE</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-code"></i>
+                <h1>AHNAJAK-CODE</h1>
+            </div>
+            <div class="user-info">
+                <span><i class="fas fa-user"></i> Admin</span>
+                <button onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </header>
 
-    <!-- NAVIGATION BAR -->
-    <nav class="navbar">
-        <div class="nav-brand">FOREST SMP</div>
-        <ul class="nav-links">
-            <li><a href="#" onclick="showPage('home')">Home</a></li>
-            <li><a href="#" onclick="showPage('rank-menu')">Ranks</a></li>
-            <li><a href="#" onclick="alert('Create / Crate Page (Coming Soon)')">Create</a></li>
-            <li><a href="#" onclick="alert('Help Page (Coming Soon)')">Help</a></li>
-        </ul>
-    </nav>
-
-    <!-- GLOBAL LOADER -->
-    <div id="global-loader" class="overlay" style="display: none;">
-        <div class="loader"></div>
-        <p style="color:white; margin-top: 15px; font-family: 'Minecraft', sans-serif;">Loading...</p>
-    </div>
-
-    <!-- HOME PAGE -->
-    <div id="page-home" class="page active">
-        <div class="container">
-            <h1 class="title mc-font">FOREST SMP STORE</h1>
-            <div class="menu-buttons">
-                <button onclick="showPage('rank-menu')" class="btn primary mc-font">1. RANKS</button>
-                <button onclick="alert('Benefit Page (Coming Soon)')" class="btn secondary mc-font">2. BENEFIT</button>
-                <button onclick="alert('Crate Page (Coming Soon)')" class="btn secondary mc-font">3. CREATE</button>
+        <!-- Dashboard Stats -->
+        <div class="dashboard">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="total-plugins">0</h3>
+                    <p>សរុប Plugins</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="available-stock">0</h3>
+                    <p>មានក្នុង Stock</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="total-revenue">$0.00</h3>
+                    <p>ចំណូលសរុប</p>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- RANK MENU PAGE -->
-    <div id="page-rank-menu" class="page">
-        <div class="container">
-            <h1 class="title mc-font">RANK OPTIONS</h1>
-            <div class="menu-buttons">
-                <button onclick="showPage('rank-select')" class="btn primary mc-font">Fill in the name</button>
-                <button onclick="alert('Redeem code section')" class="btn secondary mc-font">Redeem Code</button>
-                <button onclick="showPage('home')" class="btn back mc-font">Back to Home</button>
+        <!-- Add Plugin Form -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-plus-circle"></i> បន្ថែម Plugin ថ្មី</h2>
             </div>
-        </div>
-    </div>
-
-    <!-- RANK SELECT PAGE -->
-    <div id="page-rank-select" class="page">
-        <div class="container">
-            <h1 class="title mc-font">SELECT RANK</h1>
-            <div class="rank-grid">
-                <div class="rank-card" id="card-VIP" onclick="selectItem('rank', 'VIP', 2.00)">
-                    <h3 class="mc-font">VIP</h3><p class="mc-font">$2.00</p>
-                </div>
-                <div class="rank-card" id="card-MVP" onclick="selectItem('rank', 'MVP', 4.00)">
-                    <h3 class="mc-font">MVP</h3><p class="mc-font">$4.00</p>
-                </div>
-                <div class="rank-card" id="card-MVP+" onclick="selectItem('rank', 'MVP+', 6.00)">
-                    <h3 class="mc-font">MVP+</h3><p class="mc-font">$6.00</p>
-                </div>
-                <div class="rank-card" id="card-EPIC" onclick="selectItem('rank', 'EPIC', 8.00)">
-                    <h3 class="mc-font">EPIC</h3><p class="mc-font">$8.00</p>
-                </div>
-                <div class="rank-card" id="card-KING" onclick="selectItem('rank', 'KING', 10.00)">
-                    <h3 class="mc-font">KING</h3><p class="mc-font">$10.00</p>
-                </div>
-                <div class="rank-card" id="card-NDCLUB" onclick="selectItem('rank', 'NDCLUB', 13.00)">
-                    <h3 class="mc-font">NDCLUB</h3><p class="mc-font">$13.00</p>
-                </div>
-            </div>
-            <div class="menu-buttons row">
-                <button onclick="showPage('rank-menu')" class="btn back mc-font">Back</button>
-                <button onclick="goToFormStep()" class="btn primary mc-font">Continue</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- FORM PAGE -->
-    <div id="page-form" class="page">
-        <div class="container">
-            <h1 class="title mc-font">PLAYER INFO</h1>
-            <div class="form-group">
-                <label class="mc-font">User Name</label>
-                <input type="text" id="input-ign" placeholder="Enter your username in game">
-            </div>
-            <div class="form-group">
-                <label class="mc-font">Platform</label>
-                <select id="input-platform">
-                    <option value="Java">Java Edition</option>
-                    <option value="Bedrock">Bedrock Edition</option>
-                </select>
-            </div>
-            <hr>
-            <div class="form-group">
-                <label class="mc-font">Email Address</label>
-                <input type="email" id="input-email" placeholder="example@gmail.com">
-            </div>
-            <div class="form-group">
-                <label class="mc-font">Promotion Code</label>
-                <input type="text" id="input-promo" placeholder="Optional">
-            </div>
-            <hr>
-            <div class="menu-buttons row">
-                <button onclick="showPage('rank-select')" class="btn back mc-font">Back</button>
-                <button onclick="goToCheckoutStep()" class="btn primary mc-font">Select Payment (KHQR)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- CHECKOUT / REVIEW PAGE -->
-    <div id="page-checkout" class="page">
-        <div class="container checkout-box">
-            <h1 class="title mc-font">CHECK OUT</h1>
-            <div class="receipt">
-                <p><span class="mc-font">Category:</span> <b id="chk-category" class="mc-font">RANK</b></p>
-                <p><span class="mc-font">Item:</span> <b id="chk-item" class="mc-font">VIP</b></p>
-                <p><span class="mc-font">Username:</span> <b id="chk-ign" class="mc-font">Player123</b></p>
-                <p><span class="mc-font">Platform:</span> <b id="chk-platform" class="mc-font">Java</b></p>
-                <p><span class="mc-font">Email:</span> <b id="chk-email">test@test.com</b></p>
-                <hr>
-                <p class="total"><span class="mc-font">Total to Pay:</span> <b id="chk-usd" class="mc-font">$2.00</b></p>
-            </div>
-            <div class="menu-buttons row">
-                <button onclick="backToFormStep()" class="btn back mc-font">Back</button>
-                <button onclick="confirmAndPay()" class="btn success mc-font">Check Out</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- KHQR PAYMENT MODAL (REDESIGNED) -->
-    <div id="paymentModal" class="overlay" style="display: none;">
-        <div class="khqr-card">
-            <!-- Header -->
-            <div class="khqr-header">
-                <span style="font-weight: 800; font-size: 20px; letter-spacing: 1px;">KH<span style="border: 2px solid white; padding: 0 4px; border-radius: 4px; margin-left: 2px;">QR</span></span>
-                <span class="close-btn" onclick="closeModal()">✖</span>
-            </div>
-            
-            <!-- Body -->
-            <div class="khqr-body flex-row">
-                <!-- Info Left -->
-                <div class="khqr-info-left">
-                    <p class="merchant-name">FOREST-SMP</p>
-                    <div class="price-display">
-                        <span id="display-khqr-price" class="amount">0.50</span> <span class="currency">USD</span>
+            <div class="card-body">
+                <form id="add-plugin-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="plugin-name">ឈ្មោះ Plugin <span class="required">*</span></label>
+                            <input type="text" id="plugin-name" placeholder="ឧទាហរណ៍: Auto Farm Bot" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="plugin-price">តម្លៃ ($) <span class="required">*</span></label>
+                            <input type="number" id="plugin-price" step="0.01" min="0.01" placeholder="0.01" required>
+                        </div>
                     </div>
-                    <p class="scan-text">Scan with any<br>Banking App</p>
-                </div>
-                
-                <!-- QR Right -->
-                <div class="khqr-qr-right">
-                    <div id="qrcode-box" class="qr-container">
-                        <!-- QR code generated here -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="plugin-stock">ចំនួនក្នុង Stock <span class="required">*</span></label>
+                            <input type="number" id="plugin-stock" min="1" placeholder="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="plugin-category">ប្រភេទ</label>
+                            <select id="plugin-category">
+                                <option value="bot">Telegram Bot</option>
+                                <option value="game">Game Hack</option>
+                                <option value="tool">Tools</option>
+                                <option value="script">Script</option>
+                                <option value="other">ផ្សេងៗ</option>
+                            </select>
+                        </div>
                     </div>
+                    <div class="form-group">
+                        <label for="plugin-description">ការពិពណ៌នា</label>
+                        <textarea id="plugin-description" rows="3" placeholder="ពិពណ៌នាអំពី Plugin..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="plugin-file">ឯកសារ Plugin <span class="required">*</span></label>
+                        <div class="file-upload">
+                            <input type="file" id="plugin-file" accept=".zip,.py,.lua,.js" required>
+                            <p>គាំទ្រ: .zip, .py, .lua, .js</p>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> រក្សាទុក
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> លុបចោល
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Plugin List -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-list"></i> បញ្ជី Plugins</h2>
+                <div class="search-box">
+                    <input type="text" id="search-plugin" placeholder="🔍 ស្វែងរក Plugin...">
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="plugin-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>ឈ្មោះ</th>
+                                <th>ប្រភេទ</th>
+                                <th>តម្លៃ</th>
+                                <th>Stock</th>
+                                <th>ស្ថានភាព</th>
+                                <th>សកម្មភាព</th>
+                            </tr>
+                        </thead>
+                        <tbody id="plugin-list">
+                            <!-- Plugins will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="no-plugins" class="no-data">
+                    <i class="fas fa-inbox"></i>
+                    <p>មិនទាន់មាន Plugin នៅក្នុង Stock</p>
                 </div>
             </div>
         </div>
+
+        <!-- Sales History -->
+        <div class="card">
+            <div class="card-header">
+                <h2><i class="fas fa-history"></i> ប្រវត្តិការលក់</h2>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="sales-table">
+                        <thead>
+                            <tr>
+                                <th>កាលបរិច្ឆេទ</th>
+                                <th>Plugin</th>
+                                <th>អតិថិជន</th>
+                                <th>ចំនួន</th>
+                                <th>ស្ថានភាព</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sales-list">
+                            <!-- Sales will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>&copy; 2024 AHNAJAK-CODE. All rights reserved.</p>
+        </footer>
     </div>
 
-    <!-- SUCCESS ALERT MODAL -->
-    <div id="successAlert" class="overlay alert-overlay" style="display: none;">
-        <div class="alert-box">
-            <div class="icon-success">✔️</div>
-            <h2 class="mc-font">Payment Success!</h2>
-            <p>Your rank will be delivered shortly via RECON.</p>
-            <button onclick="closeSuccessAlert()" class="btn primary mc-font">Close</button>
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> កែសម្រួល Plugin</h3>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="edit-plugin-form">
+                    <input type="hidden" id="edit-id">
+                    <div class="form-group">
+                        <label>ឈ្មោះ Plugin</label>
+                        <input type="text" id="edit-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>តម្លៃ ($)</label>
+                        <input type="number" id="edit-price" step="0.01" min="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ចំនួនក្នុង Stock</label>
+                        <input type="number" id="edit-stock" min="0" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> រក្សាទុក
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="closeModal()">
+                            <i class="fas fa-times"></i> បិទ
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <script src="script.js"></script>
 </body>
-    </html>
-    
+</html>
