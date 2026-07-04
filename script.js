@@ -64,10 +64,13 @@ async function loadPlugins() {
     }
 }
 
-// Add Plugin
+// Add Plugin - FIXED VERSION
 document.getElementById('add-plugin-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    console.log('📤 Starting plugin upload...');
+    
+    // Create FormData
     const formData = new FormData();
     formData.append('name', document.getElementById('plugin-name').value);
     formData.append('price', document.getElementById('plugin-price').value);
@@ -75,18 +78,30 @@ document.getElementById('add-plugin-form').addEventListener('submit', async (e) 
     formData.append('category', document.getElementById('plugin-category').value);
     formData.append('description', document.getElementById('plugin-description').value);
     
+    // Add file
     const fileInput = document.getElementById('plugin-file');
     if (fileInput.files[0]) {
         formData.append('file', fileInput.files[0]);
+        console.log('📁 File attached:', fileInput.files[0].name);
+    } else {
+        alert('❌ សូមជ្រើសរើសឯកសារ Plugin!');
+        return;
+    }
+    
+    // Debug: Log all form data
+    for (let pair of formData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
     }
     
     try {
         const response = await fetch(`${API_URL}/plugins`, {
             method: 'POST',
             body: formData
+            // Don't set Content-Type header - let browser set it with boundary
         });
         
         const result = await response.json();
+        console.log('📥 Response:', result);
         
         if (result.success) {
             alert('✅ ' + result.message);
@@ -97,8 +112,8 @@ document.getElementById('add-plugin-form').addEventListener('submit', async (e) 
             alert('❌ Error: ' + result.error);
         }
     } catch (error) {
-        alert('❌ មានបញ្ហាក្នុងការបន្ថែម Plugin');
-        console.error(error);
+        console.error('Upload error:', error);
+        alert('❌ មានបញ្ហាក្ុងការបន្ែម Plugin');
     }
 });
 
@@ -152,7 +167,7 @@ document.getElementById('edit-plugin-form').addEventListener('submit', async (e)
             alert('❌ Error: ' + result.error);
         }
     } catch (error) {
-        alert('❌ មានបញ្ហាកនុងការកែសម្រួល');
+        alert('❌ មានបញ្ហាក្នុងការកែសម្រួល');
         console.error(error);
     }
 });
@@ -236,4 +251,4 @@ function logout() {
     if (confirm('តើអ្នកចង់ចាកចេញមែនទេ?')) {
         alert('Logout successful!');
     }
-    }
+                        }
