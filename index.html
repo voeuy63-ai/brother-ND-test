@@ -1,213 +1,243 @@
 <!DOCTYPE html>
 <html lang="km">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plugin Stock Management - AHNAJAK-CODE</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Rank Store — ទិញ Rank</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b22; --panel2:#1c2330; --line:#262d3a;
+    --txt:#e6edf3; --muted:#8b949e; --green:#3fb950; --green2:#2ea043;
+    --gold:#f0b90b; --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Segoe UI",Roboto,"Noto Sans Khmer",system-ui,sans-serif;
+    background:var(--bg);color:var(--txt);line-height:1.6;
+    background-image:
+      radial-gradient(900px 500px at 80% -10%,rgba(63,185,80,.10),transparent),
+      radial-gradient(700px 400px at -10% 10%,rgba(46,160,67,.08),transparent);
+  }
+  a{color:var(--green);text-decoration:none}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 18px}
+  /* header */
+  header{position:sticky;top:0;z-index:30;backdrop-filter:blur(10px);
+    background:rgba(14,17,23,.75);border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.5px}
+  .logo .cube{width:30px;height:30px;border-radius:6px;
+    background:linear-gradient(135deg,#3fb950,#1a7f37);
+    box-shadow:0 4px 12px rgba(63,185,80,.4);display:grid;place-items:center;font-size:16px}
+  .nav a.admin{color:var(--muted);font-size:14px;border:1px solid var(--line);padding:8px 14px;border-radius:9px}
+  .nav a.admin:hover{color:var(--txt);border-color:#3a4658}
+  /* hero */
+  .hero{text-align:center;padding:64px 0 30px}
+  .hero .tag{display:inline-block;background:#0d2818;border:1px solid var(--green2);color:var(--green);
+    padding:6px 14px;border-radius:99px;font-size:13px;font-weight:600;margin-bottom:18px}
+  .hero h1{font-size:clamp(30px,5vw,52px);font-weight:900;letter-spacing:-.5px;line-height:1.1}
+  .hero h1 span{background:linear-gradient(90deg,#3fb950,#9aea8e);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{color:var(--muted);max-width:560px;margin:16px auto 0;font-size:17px}
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px;padding:24px 0 60px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);
+    padding:24px;position:relative;overflow:hidden;transition:transform .15s,border-color .15s}
+  .card:hover{transform:translateY(-4px)}
+  .card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--rc,#3fb950)}
+  .card .badge{position:absolute;top:14px;right:14px;font-size:11px;background:rgba(255,255,255,.06);
+    padding:4px 9px;border-radius:6px;color:var(--muted)}
+  .card h3{font-size:24px;font-weight:900;letter-spacing:.5px;color:var(--rc,#3fb950)}
+  .price{font-size:34px;font-weight:900;margin:8px 0 4px}
+  .price small{font-size:15px;color:var(--muted);font-weight:600}
+  .perks{list-style:none;margin:16px 0}
+  .perks li{padding:6px 0 6px 26px;position:relative;color:#cdd9e5;font-size:14.5px}
+  .perks li::before{content:"✓";position:absolute;left:0;color:var(--rc,#3fb950);font-weight:900}
+  .btn{display:block;width:100%;padding:13px;border:none;border-radius:10px;cursor:pointer;
+    font-size:16px;font-weight:800;letter-spacing:.5px;color:#fff;transition:filter .15s,transform .1s}
+  .btn:hover{filter:brightness(1.1)}
+  .btn:active{transform:scale(.98)}
+  .btn.buy{background:var(--rc,#3fb950)}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+  .btn.gold{background:var(--gold);color:#1a1300}
+  /* modal */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);
+    display:none;place-items:center;z-index:50;padding:18px}
+  .overlay.show{display:grid}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;
+    max-width:440px;width:100%;padding:28px;max-height:92vh;overflow:auto}
+  .modal h2{font-size:22px;margin-bottom:4px}
+  .modal .sub{color:var(--muted);font-size:14px;margin-bottom:20px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:7px;font-weight:600}
+  .field input{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--txt);
+    padding:12px 14px;border-radius:10px;font-size:16px;font-family:inherit}
+  .field input:focus{outline:none;border-color:var(--green)}
+  .summary{display:flex;justify-content:space-between;background:var(--panel2);
+    padding:12px 14px;border-radius:10px;margin:18px 0;font-size:15px}
+  .summary b{color:var(--gold)}
+  .err{background:#3b1219;border:1px solid #6e2a37;color:#ff9aa6;padding:10px 12px;border-radius:8px;
+    font-size:14px;margin-bottom:14px;display:none}
+  /* payment screen */
+  .pay{text-align:center}
+  .qr{width:230px;height:230px;margin:8px auto;background:#fff;border-radius:14px;padding:12px}
+  .qr img{width:100%;height:100%}
+  .amt{font-size:30px;font-weight:900;margin:6px 0}
+  .amt span{color:var(--gold)}
+  .deeplink{display:inline-flex;align-items:center;gap:8px;margin-top:10px}
+  .status{margin-top:18px;font-weight:700}
+  .status.waiting{color:var(--gold)}
+  .status.paid{color:var(--green)}
+  .spin{width:18px;height:18px;border:2.5px solid rgba(240,185,11,.25);border-top-color:var(--gold);
+    border-radius:50%;display:inline-block;animation:sp 1s linear infinite;vertical-align:-3px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .countdown{font-size:13px;color:var(--muted);margin-top:8px}
+  .check{font-size:46px}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:30px 0;border-top:1px solid var(--line)}
+</style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo">
-                <i class="fas fa-code"></i>
-                <h1>AHNAJAK-CODE</h1>
-            </div>
-            <div class="user-info">
-                <span><i class="fas fa-user"></i> Admin</span>
-                <button onclick="logout()" class="btn-logout"><i class="fas fa-sign-out-alt"></i></button>
-            </div>
-        </header>
 
-        <!-- Dashboard Stats -->
-        <div class="dashboard">
-            <div class="stat-card">
-                <div class="stat-icon blue">
-                    <i class="fas fa-box"></i>
-                </div>
-                <div class="stat-info">
-                    <h3 id="total-plugins">0</h3>
-                    <p>សរុប Plugins</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon green">
-                    <i class="fas fa-check-circle"></i>
-                </div>
-                <div class="stat-info">
-                    <h3 id="available-stock">0</h3>
-                    <p>មានក្នុង Stock</p>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon orange">
-                    <i class="fas fa-dollar-sign"></i>
-                </div>
-                <div class="stat-info">
-                    <h3 id="total-revenue">$0.00</h3>
-                    <p>ចំណូលសរុប</p>
-                </div>
-            </div>
-        </div>
+<header>
+  <div class="wrap nav">
+    <div class="logo"><span class="cube">⛏️</span> MC RANK STORE</div>
+    <a class="admin" href="/admin">Admin →</a>
+  </div>
+</header>
 
-        <!-- Add Plugin Form -->
-        <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-plus-circle"></i> បន្ថែម Plugin ថ្មី</h2>
-            </div>
-            <div class="card-body">
-                <form id="add-plugin-form" enctype="multipart/form-data">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="plugin-name">ឈ្មោះ Plugin <span class="required">*</span></label>
-                            <input type="text" id="plugin-name" placeholder="ឧទាហរណ៍: Auto Farm Bot" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="plugin-price">តម្លៃ ($) <span class="required">*</span></label>
-                            <input type="number" id="plugin-price" step="0.01" min="0.01" placeholder="0.01" required>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="plugin-stock">ចំនួនក្នុង Stock <span class="required">*</span></label>
-                            <input type="number" id="plugin-stock" min="1" placeholder="10" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="plugin-category">ប្រភេទ</label>
-                            <select id="plugin-category">
-                                <option value="bot">Telegram Bot</option>
-                                <option value="game">Game Hack</option>
-                                <option value="tool">Tools</option>
-                                <option value="script">Script</option>
-                                <option value="other">ផ្សេងៗ</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="plugin-description">ការពិពណ៌នា</label>
-                        <textarea id="plugin-description" rows="3" placeholder="ពិពណ៌នាអំពី Plugin..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="plugin-file">ឯកសារ Plugin <span class="required">*</span></label>
-                        <div class="file-upload">
-                            <input type="file" id="plugin-file" accept=".zip,.py,.lua,.js" required>
-                            <p>គាំទ្រ: .zip, .py, .lua, .js</p>
-                        </div>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> រក្សាទុក
-                        </button>
-                        <button type="reset" class="btn btn-secondary">
-                            <i class="fas fa-redo"></i> លុបចោល
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+<div class="wrap">
+  <section class="hero">
+    <span class="tag">⚡ ទូទាត់ Bakong KHQR ស្វ័យប្រវត្តិ</span>
+    <h1>លើកស្ទ័យ Minecraft របស់អ្នក <span>ជាមួយ Rank</span></h1>
+    <p>ជ្រើស Rank → បញ្ចូលឈ្មោះ Minecraft → ស្កេន QR Bakong ដើម្បីបង់។ ការទូទាត់ត្រូវបានផ្ទៀងផ្ទាត់ដោយស្វ័យប្រវត្តិ ហើយ Rank នឹងត្រូវបានផ្ដល់ភ្លាមៗ។</p>
+  </section>
 
-        <!-- Plugin List -->
-        <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-list"></i> បញ្ជី Plugins</h2>
-                <div class="search-box">
-                    <input type="text" id="search-plugin" placeholder="🔍 ស្វែងរក Plugin...">
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="plugin-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>ឈ្មោះ</th>
-                                <th>ប្រភេទ</th>
-                                <th>តម្លៃ</th>
-                                <th>Stock</th>
-                                <th>ស្ថានភាព</th>
-                                <th>សកម្មភាព</th>
-                            </tr>
-                        </thead>
-                        <tbody id="plugin-list">
-                            <!-- Plugins will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-                <div id="no-plugins" class="no-data">
-                    <i class="fas fa-inbox"></i>
-                    <p>មិនទាន់មាន Plugin នៅក្នុង Stock</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sales History -->
-        <div class="card">
-            <div class="card-header">
-                <h2><i class="fas fa-history"></i> ប្រវតតិការលក់</h2>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="sales-table">
-                        <thead>
-                            <tr>
-                                <th>កាលបរិច្ឆេទ</th>
-                                <th>Plugin</th>
-                                <th>អតិថិជន</th>
-                                <th>ចំនួន</th>
-                                <th>ស្ថានភាព</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sales-list">
-                            <!-- Sales will be loaded here -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="footer">
-            <p>&copy; 2024 AHNAJAK-CODE. All rights reserved.</p>
-        </footer>
+  <div class="grid" id="ranks">
+    <div class="card" style="text-align:center;color:var(--muted);padding:40px">
+      កំពុងផ្ទុក Rank…
     </div>
+  </div>
+</div>
 
-    <!-- Edit Modal -->
-    <div id="edit-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-edit"></i> កែសម្រួល Plugin</h3>
-                <span class="close" onclick="closeModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="edit-plugin-form">
-                    <input type="hidden" id="edit-id">
-                    <div class="form-group">
-                        <label>ឈ្មោះ Plugin</label>
-                        <input type="text" id="edit-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label>តម្លៃ ($)</label>
-                        <input type="number" id="edit-price" step="0.01" min="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label>ចំនួនក្នុង Stock</label>
-                        <input type="number" id="edit-stock" min="0" required>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> រក្សាទុក
-                        </button>
-                        <button type="button" class="btn btn-secondary" onclick="closeModal()">
-                            <i class="fas fa-times"></i> បិទ
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+<footer class="wrap">
+  បង់លុយសុវត្ថិភាពតាម Bakong KHQR • © <span id="yr"></span> MC Rank Store
+</footer>
+
+<!-- Modal -->
+<div class="overlay" id="ov">
+  <div class="modal" id="modal"><!-- injected --></div>
+</div>
+
+<script>
+const API = "";
+let RANKS = [];
+const $ = s => document.querySelector(s);
+
+async function loadRanks(){
+  try{
+    const r = await fetch(API+"/api/ranks");
+    RANKS = await r.json();
+    render();
+  }catch(e){
+    $("#ranks").innerHTML = '<div class="card" style="text-align:center;color:#ff9aa6;padding:40px">មិនអាចទាក់ទង server បាន</div>';
+  }
+}
+
+function render(){
+  if(!RANKS.length){ $("#ranks").innerHTML='<div class="card" style="color:var(--muted)">មិនទាន់មាន Rank</div>'; return; }
+  $("#ranks").innerHTML = RANKS.map(r=>`
+    <div class="card" style="--rc:${r.color}">
+      <span class="badge">RANK</span>
+      <h3>${r.name}</h3>
+      <div class="price">$${r.price}<small> ${r.currency}</small></div>
+      <ul class="perks">${(r.perks||[]).map(p=>`<li>${p}</li>`).join("")}</ul>
+      <button class="btn buy" onclick="openBuy('${r.id}')">ទិញ ${r.name}</button>
+    </div>`).join("");
+}
+
+/* ---------- Buy: enter username ---------- */
+let currentRank=null;
+function openBuy(id){
+  currentRank = RANKS.find(x=>x.id===id);
+  if(!currentRank) return;
+  $("#modal").innerHTML = `
+    <h2>ទិញ Rank ${currentRank.name}</h2>
+    <div class="sub">បញ្ចូលឈ្មោះ Minecraft របស់អ្នក (Java username)</div>
+    <div class="err" id="err"></div>
+    <div class="field">
+      <label>Minecraft Username</label>
+      <input id="username" placeholder="ឧ. Steve" autocomplete="off" onkeydown="if(event.key==='Enter')createOrder()">
     </div>
+    <div class="summary"><span>តម្លៃ</span><span><b>$${currentRank.price}</b> ${currentRank.currency}</span></div>
+    <button class="btn buy" onclick="createOrder()">បន្ត → ទូទាត់</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="closeModal()">បោះបង់</button>`;
+  $("#ov").classList.add("show");
+  setTimeout(()=>$("#username").focus(),50);
+}
 
-    <script src="script.js"></script>
+async function createOrder(){
+  const username = ($("#username").value||"").trim();
+  const err = $("#err"); err.style.display="none";
+  if(username.length<3){ err.textContent="ឈ្មោះខ្លីពេក (យ៉ាងតិច 3 តួអក្សរ)"; err.style.display="block"; return; }
+  const btn=event.target; btn.disabled=true; btn.textContent="កំពុងបង្កើត…";
+  try{
+    const r = await fetch(API+"/api/orders",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({username,rank_id:currentRank.id})
+    });
+    const data = await r.json();
+    if(!r.ok) throw new Error(data.error||"មិនបាន");
+    showPayment(data, username);
+  }catch(e){
+    err.textContent = e.message; err.style.display="block";
+    btn.disabled=false; btn.textContent="បន្ត → ទូទាត់";
+  }
+}
+
+/* ---------- Payment screen + polling ---------- */
+let pollTimer=null;
+function showPayment(order, username){
+  $("#modal").innerHTML = `
+    <div class="pay">
+      <div class="sub">ស្កេន QR នេះដោយ Bakong App ឬ App ធនាគារដើម្បីបង់</div>
+      <div class="qr"><img id="qrimg" alt="KHQR"></div>
+      <div style="color:var(--muted);font-size:13px">សម្រាប់៖ <b style="color:var(--txt)">${escapeHtml(username)}</b> • ${order.rank_name}</div>
+      <div class="amt"><span>$${order.amount}</span> ${order.currency}</div>
+      ${order.deeplink?`<div class="deeplink"><a class="btn gold" style="width:auto;padding:11px 22px" href="${order.deeplink}" target="_blank">📲 បើក Bakong App</a></div>`:""}
+      <div class="status waiting" id="status"><span class="spin"></span> កំពុងរង់ចាំការបង់ប្រាក់…</div>
+      <div class="countdown" id="cd">QR មានអាយុកាល ១ ថ្ងៃ</div>
+      <button class="btn ghost" style="margin-top:18px" onclick="closeModal()">បិទ</button>
+    </div>`;
+  $("#qrimg").src = order.qr_image;
+  $("#ov").classList.add("show");
+
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(()=>pollOrder(order.id), 3000);
+  pollOrder(order.id);
+}
+
+async function pollOrder(id){
+  try{
+    const r = await fetch(API+"/api/orders/"+id);
+    const d = await r.json();
+    if(d.status==="paid"){
+      if(pollTimer){clearInterval(pollTimer);pollTimer=null;}
+      $("#status").className="status paid";
+      $("#status").innerHTML = `<div class="check">✅</div>បង់ប្រាក់រួចហើយ!<br>
+        <span style="font-weight:400;font-size:13px;color:var(--muted)">Rank <b style="color:var(--gold)">${d.rank_name}</b>
+        នឹងផ្ដល់ឱ្យ <b style="color:var(--txt)">${escapeHtml(d.username)}</b>
+        ${d.delivered?"ភ្លាមៗ ✓":"ក្នុងពេលឆាប់ៗ (RCON កំពុងដំណើរការ)"}</span>`;
+      $("#cd").textContent="អរគុណ! អ្នកអាចបិទផ្ទាំងនេះបាន។";
+    }
+  }catch(e){}
+}
+
+function closeModal(){ if(pollTimer){clearInterval(pollTimer);pollTimer=null;} $("#ov").classList.remove("show"); }
+$("#ov").addEventListener("click",e=>{ if(e.target.id==="ov") closeModal(); });
+
+function escapeHtml(s){return (s||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+$("#yr").textContent = new Date().getFullYear();
+loadRanks();
+</script>
 </body>
-</html>
+    </html>
+    
