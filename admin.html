@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 10px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336, #da190b);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #2196F3, #0b7dda);
+        }
+
+        .admin-container {
+            display: none;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .stat-card h3 {
+            font-size: 12px;
+            margin-bottom: 15px;
+            color: #4CAF50;
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        /* Ranks Management */
+        .ranks-container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 30px;
+        }
+
+        .ranks-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .ranks-header h2 {
+            font-size: 16px;
+        }
+
+        .rank-form {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .rank-form h3 {
+            font-size: 12px;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .rank-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .rank-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s;
+        }
+
+        .rank-item:hover {
+            transform: translateY(-5px);
+            border-color: #4CAF50;
+        }
+
+        .rank-item.inactive {
+            opacity: 0.5;
+            border-color: #f44336;
+        }
+
+        .rank-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .rank-item-name {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rank-item-price {
+            font-size: 16px;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .rank-item-desc {
+            font-size: 8px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .rank-item-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 8px;
+        }
+
+        /* Transactions */
+        .transactions-container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 15px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .transactions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .transactions-header h2 {
+            font-size: 16px;
+        }
+
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .transaction-table th,
+        .transaction-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+        .transaction-table th {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 8px;
+        }
+
+        .status-badge.completed {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff00;
+        }
+
+        .status-badge.pending {
+            background: rgba(255, 165, 0, 0.2);
+            color: orange;
+        }
+
+        .status-badge.failed {
+            background: rgba(255, 0, 0, 0.2);
+            color: #ff0000;
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            font-size: 10px;
+            background: #2196F3;
+        }
+
+        .refresh-btn:hover {
+            background: #0b7dda;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.95);
+            border: 3px solid #4CAF50;
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 16px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Form -->
+    <div class="login-container" id="loginContainer">
+        <h2>Admin Login</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="btn" style="width: 100%;">Login</button>
+        </form>
+    </div>
+
+    <!-- Admin Panel -->
+    <div class="admin-container" id="adminContainer">
+        <h1 style="text-align: center; margin-bottom: 40px; font-size: 24px;">Admin Dashboard</h1>
+        
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="showTab('ranks')">🏆 Manage Ranks</button>
+            <button class="tab-btn" onclick="showTab('transactions')">💰 Transactions</button>
+        </div>
+
+        <!-- Ranks Tab -->
+        <div id="ranksTab" class="tab-content active">
+            <!-- Add/Edit Rank Form -->
+            <div class="ranks-container">
+                <div class="rank-form" id="rankForm">
+                    <h3 id="rankFormTitle">Add New Rank</h3>
+                    <input type="hidden" id="editRankId" value="">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Rank Name</label>
+                            <input type="text" id="rankName" placeholder="e.g., acacia" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Price ($)</label>
+                            <input type="number" id="rankPrice" step="0.01" min="0.01" placeholder="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Description</label>
+                            <input type="text" id="rankDescription" placeholder="Rank description">
+                        </div>
+                        <div class="form-group">
+                            <label>Color (Hex)</label>
+                            <input type="color" id="rankColor" value="#4CAF50" style="height: 45px;">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Icon (Emoji)</label>
+                            <input type="text" id="rankIcon" placeholder="⭐" maxlength="2">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end; gap: 10px;">
+                            <button class="btn" onclick="saveRank()" style="flex: 1;">💾 Save Rank</button>
+                            <button class="btn btn-danger" onclick="cancelEdit()" style="flex: 1;">❌ Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ranks List -->
+            <div class="ranks-container">
+                <div class="ranks-header">
+                    <h2>All Ranks</h2>
+                    <button class="btn refresh-btn" onclick="loadRanks()">🔄 Refresh</button>
+                </div>
+                <div class="rank-list" id="rankList">
+                    <!-- Ranks will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions Tab -->
+        <div id="transactionsTab" class="tab-content">
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Transactions</h3>
+                    <div class="value" id="totalTransactions">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Revenue</h3>
+                    <div class="value" id="totalRevenue">$0.00</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Completed</h3>
+                    <div class="value" id="completedCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Pending</h3>
+                    <div class="value" id="pendingCount">0</div>
+                </div>
+            </div>
+
+            <!-- Transactions -->
+            <div class="transactions-container">
+                <div class="transactions-header">
+                    <h2>Recent Transactions</h2>
+                    <button class="btn refresh-btn" onclick="loadTransactions()">🔄 Refresh</button>
+                </div>
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Platform</th>
+                            <th>Email</th>
+                            <th>Rank</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = '';
+
+        // Tab Navigation
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            if (tabName === 'ranks') {
+                loadRanks();
+            } else if (tabName === 'transactions') {
+                loadTransactions();
+            }
+        }
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    authToken = data.token;
+                    document.getElementById('loginContainer').style.display = 'none';
+                    document.getElementById('adminContainer').style.display = 'block';
+                    loadRanks();
+                } else {
+                    alert('Invalid credentials');
+                }
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        });
+
+        // ============ RANKS MANAGEMENT ============
+
+        async function loadRanks() {
+            try {
+                const response = await fetch('/api/admin/ranks', {
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    updateRanksList(data.ranks);
+                }
+            } catch (error) {
+                console.error('Error loading ranks:', error);
+            }
+        }
+
+        function updateRanksList(ranks) {
+            const rankList = document.getElementById('rankList');
+            rankList.innerHTML = '';
+
+            if (ranks.length === 0) {
+                rankList.innerHTML = '<p style="text-align: center; padding: 40px; opacity: 0.5;">No ranks yet. Add your first rank above!</p>';
+                return;
+            }
+
+            ranks.forEach(rank => {
+                const rankItem = document.createElement('div');
+                rankItem.className = 'rank-item' + (rank.active ? '' : ' inactive');
+                rankItem.innerHTML = `
+                    <div class="rank-item-header">
+                        <div class="rank-item-name" style="color: ${rank.color}">
+                            <span>${rank.icon}</span>
+                            <span>${rank.name}</span>
+                        </div>
+                        <span class="status-badge ${rank.active ? 'completed' : 'failed'}">
+                            ${rank.active ? 'Active' : 'Inactive'}
+                        </span>
+                    </div>
+                    <div class="rank-item-price">$${rank.price.toFixed(2)}</div>
+                    <div class="rank-item-desc">${rank.description || 'No description'}</div>
+                    <div class="rank-item-actions">
+                        <button class="btn btn-small btn-info" onclick="editRank(${rank.id}, '${rank.name}', ${rank.price}, '${rank.description}', '${rank.color}', '${rank.icon}')">✏️ Edit</button>
+                        <button class="btn btn-small btn-warning" onclick="toggleRank(${rank.id})">${rank.active ? '🔴 Disable' : '🟢 Enable'}</button>
+                        <button class="btn btn-small btn-danger" onclick="deleteRank(${rank.id})">🗑️ Delete</button>
+                    </div>
+                `;
+                rankList.appendChild(rankItem);
+            });
+        }
+
+        async function saveRank() {
+            const editId = document.getElementById('editRankId').value;
+            const name = document.getElementById('rankName').value.trim().toLowerCase();
+            const price = parseFloat(document.getElementById('rankPrice').value);
+            const description = document.getElementById('rankDescription').value;
+            const color = document.getElementById('rankColor').value;
+            const icon = document.getElementById('rankIcon').value || '⭐';
+
+            if (!name || !price) {
+                alert('Please fill in rank name and price');
+                return;
+            }
+
+            try {
+                let url = '/api/admin/ranks';
+                let method = 'POST';
+
+                if (editId) {
+                    url = `/api/admin/ranks/${editId}`;
+                    method = 'PUT';
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + authToken
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        price: price,
+                        description: description,
+                        color: color,
+                        icon: icon,
+                        active: 1
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    cancelEdit();
+                    loadRanks();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function editRank(id, name, price, description, color, icon) {
+            document.getElementById('editRankId').value = id;
+            document.getElementById('rankName').value = name;
+            document.getElementById('rankPrice').value = price;
+            document.getElementById('rankDescription').value = description;
+            document.getElementById('rankColor').value = color;
+            document.getElementById('rankIcon').value = icon;
+            document.getElementById('rankFormTitle').textContent = 'Edit Rank: ' + name;
+            
+            // Scroll to form
+            document.getElementById('rankForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            document.getElementById('editRankId').value = '';
+            document.getElementById('rankName').value = '';
+            document.getElementById('rankPrice').value = '';
+            document.getElementById('rankDescription').value = '';
+            document.getElementById('rankColor').value = '#4CAF50';
+            document.getElementById('rankIcon').value = '';
+            document.getElementById('rankFormTitle').textContent = 'Add New Rank';
+        }
+
+        async function deleteRank(id) {
+            if (!confirm('Are you sure you want to delete this rank?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/ranks/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Rank deleted successfully');
+                    loadRanks();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        async function toggleRank(id) {
+            try {
+                const response = await fetch(`/api/admin/ranks/${id}/toggle`, {
+                    method: 'POST',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    loadRanks();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // ============ TRANSACTIONS ============
+
+        async function loadTransactions() {
+            try {
+                const response = await fetch('/api/admin/transactions', {
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    updateStats(data.stats);
+                    updateTransactions(data.transactions);
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+            }
+        }
+
+        function updateStats(stats) {
+            document.getElementById('totalTransactions').textContent = stats.total;
+            document.getElementById('totalRevenue').textContent = '$' + stats.revenue.toFixed(2);
+            document.getElementById('completedCount').textContent = stats.completed;
+            document.getElementById('pendingCount').textContent = stats.pending;
+        }
+
+        function updateTransactions(transactions) {
+            const tbody = document.getElementById('transactionsBody');
+            tbody.innerHTML = '';
+
+            transactions.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${transaction.id}</td>
+                    <td>${transaction.name}</td>
+                    <td>${transaction.platform}</td>
+                    <td>${transaction.email}</td>
+                    <td>${transaction.rank}</td>
+                    <td>$${transaction.amount.toFixed(2)}</td>
+                    <td><span class="status-badge ${transaction.status}">${transaction.status}</span></td>
+                    <td>${new Date(transaction.created_at).toLocaleString()}</td>
+                    <td><button class="btn btn-small btn-danger" onclick="deleteTransaction(${transaction.id})">Delete</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        async function deleteTransaction(id) {
+            if (!confirm('Are you sure you want to delete this transaction?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/admin/transactions/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': 'Bearer ' + authToken }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    loadTransactions();
+                } else {
+                    alert('Failed to delete transaction');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            if (authToken) {
+                loadRanks();
+                loadTransactions();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>
