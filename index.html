@@ -680,219 +680,281 @@
     </div>
 
     <script>
-        let selectedRank = '';
-        let selectedPrice = 0.01;
-        let orderData = {};
-        let paymentCheckInterval = null;
+     let selectedRank = '';
+let selectedPrice = 0.01;
+let orderData = {};
+let paymentCheckInterval = null;
+let availableRanks = []; // Store ranks from database
 
-        // Page Navigation
-        function showPage(pageName) {
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
+// ============ LOAD RANKS FROM DATABASE ============
+async function loadRanks() {
+    try {
+        const response = await fetch('/api/ranks');
+        const data = await response.json();
+        
+        if (data.success) {
+            availableRanks = data.ranks;
+            renderRankCards();
+            updateRankSelect();
+        } else {
+            console.error('Failed to load ranks:', data.error);
+            // Fallback to default ranks
+            loadDefaultRanks();
+        }
+    } catch (error) {
+        console.error('Error loading ranks:', error);
+        // Fallback to default ranks
+        loadDefaultRanks();
+    }
+}
+
+function loadDefaultRanks() {
+    availableRanks = [
+        { name: 'acacia', price: 0.01, description: 'Basic rank', color: '#4CAF50', icon: '🌳' },
+        { name: 'azalea', price: 0.01, description: 'Advanced rank', color: '#2196F3', icon: '🌸' },
+        { name: 'jungle', price: 0.01, description: 'Premium rank', color: '#FF9800', icon: '🌴' }
+    ];
+    renderRankCards();
+    updateRankSelect();
+}
+
+function renderRankCards() {
+    const rankGrid = document.querySelector('.rank-grid');
+    rankGrid.innerHTML = '';
+    
+    availableRanks.forEach(rank => {
+        const rankCard = document.createElement('div');
+        rankCard.className = 'rank-card';
+        rankCard.style.borderColor = rank.color;
+        rankCard.innerHTML = `
+            <div style="font-size: 48px; margin-bottom: 15px;">${rank.icon}</div>
+            <h3 style="color: ${rank.color}">${rank.name}</h3>
+            <p style="font-size: 8px; margin-bottom: 15px; opacity: 0.8;">${rank.description}</p>
+            <div class="price">$${rank.price.toFixed(2)}</div>
+            <button class="btn" onclick="event.stopPropagation(); buyRank('${rank.name}', ${rank.price})">BUY</button>
+        `;
+        rankCard.onclick = function() { selectRank(rank.name, rank.price); };
+        rankGrid.appendChild(rankCard);
+    });
+}
+
+function updateRankSelect() {
+    const rankSelect = document.getElementById('rankSelect');
+    rankSelect.innerHTML = '<option value="">Select rank</option>';
+    
+    availableRanks.forEach(rank => {
+        const option = document.createElement('option');
+        option.value = rank.name;
+        option.textContent = `${rank.name} - $${rank.price.toFixed(2)}`;
+        rankSelect.appendChild(option);
+    });
+}
+
+// Page Navigation
+function showPage(pageName) {
+    document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+    });
+    document.querySelectorAll('.navbar a').forEach(link => {
+        link.classList.remove('active');
+    });
+
+    if (pageName === 'home') {
+        document.getElementById('homePage').classList.add('active');
+        document.querySelector('.navbar a[onclick*="home"]').classList.add('active');
+    } else if (pageName === 'rank') {
+        document.getElementById('rankPage').classList.add('active');
+        document.querySelector('.navbar a[onclick*="rank"]').classList.add('active');
+        loadRanks(); // Reload ranks when visiting rank page
+    } else if (pageName === 'help') {
+        document.getElementById('helpPage').classList.add('active');
+        document.querySelector('.navbar a[onclick*="help"]').classList.add('active');
+    } else if (pageName === 'form') {
+        document.getElementById('formPage').classList.add('active');
+    } else if (pageName === 'checkout') {
+        document.getElementById('checkoutPage').classList.add('active');
+    }
+}
+
+// Rank Selection
+function selectRank(rank, price) {
+    selectedRank = rank;
+    selectedPrice = price;
+    document.querySelectorAll('.rank-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    event.currentTarget.classList.add('selected');
+}
+
+function buyRank(rank, price) {
+    selectedRank = rank;
+    selectedPrice = price;
+    document.getElementById('rankSelect').value = rank;
+    document.getElementById('totalAmount').textContent = price.toFixed(2);
+    showPage('form');
+}
+
+// Form Handling
+document.getElementById('playerName').addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\s+/g, '_');
+});
+
+document.getElementById('platform').addEventListener('change', function(e) {
+    if (e.target.value === 'bedrock') {
+        let name = document.getElementById('playerName');
+        if (!name.value.endsWith('.')) {
+            name.value = name.value + '.';
+        }
+    }
+});
+
+document.getElementById('email').addEventListener('input', function(e) {
+    let value = e.target.value;
+    if (value && !value.includes('@gmail.com')) {
+        e.target.setCustomValidity('Please enter a valid Gmail address');
+    } else {
+        e.target.setCustomValidity('');
+    }
+});
+
+document.getElementById('rankSelect').addEventListener('change', function(e) {
+    if (e.target.value) {
+        selectedRank = e.target.value;
+        // Find price from available ranks
+        const rank = availableRanks.find(r => r.name === e.target.value);
+        if (rank) {
+            selectedPrice = rank.price;
+            document.getElementById('totalAmount').textContent = selectedPrice.toFixed(2);
+        }
+    }
+});
+
+document.getElementById('purchaseForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    let name = document.getElementById('playerName').value;
+    let platform = document.getElementById('platform').value;
+    let email = document.getElementById('email').value;
+    let promotion = document.getElementById('promotion').value || 'none';
+    let rank = document.getElementById('rankSelect').value;
+
+    if (!name || !platform || !email || !rank) {
+        alert('Please fill in all required fields');
+        return;
+    }
+
+    if (!email.endsWith('@gmail.com')) {
+        alert('Please enter a valid Gmail address');
+        return;
+    }
+
+    orderData = {
+        name: name,
+        platform: platform,
+        email: email,
+        promotion: promotion,
+        rank: rank,
+        price: selectedPrice
+    };
+
+    document.getElementById('checkoutName').textContent = name;
+    document.getElementById('checkoutPlatform').textContent = platform;
+    document.getElementById('checkoutEmail').textContent = email;
+    document.getElementById('checkoutPromotion').textContent = promotion;
+    document.getElementById('checkoutRank').textContent = rank;
+    document.getElementById('checkoutTotal').textContent = selectedPrice.toFixed(2);
+
+    showPage('checkout');
+});
+
+// Payment
+function proceedToPayment() {
+    document.getElementById('paymentAmount').textContent = orderData.price.toFixed(2);
+    document.getElementById('paymentModal').classList.add('active');
+    
+    generateQRCode();
+    startPaymentCheck();
+}
+
+function generateQRCode() {
+    const qrImage = document.getElementById('qrImage');
+    qrImage.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjEyNSIgeT0iMTI1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiPktIUVIgQ29kZTwvdGV4dD48L3N2Zz4=';
+}
+
+function selectBank(bank) {
+    document.querySelectorAll('.bank-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.currentTarget.classList.add('active');
+    console.log('Selected bank:', bank);
+}
+
+function startPaymentCheck() {
+    const statusEl = document.getElementById('paymentStatus');
+    statusEl.textContent = 'Waiting for payment...';
+    statusEl.className = 'payment-status pending';
+
+    paymentCheckInterval = setInterval(async () => {
+        try {
+            const response = await fetch('/api/check_payment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order_id: orderData.order_id })
             });
-            document.querySelectorAll('.navbar a').forEach(link => {
-                link.classList.remove('active');
-            });
-
-            if (pageName === 'home') {
-                document.getElementById('homePage').classList.add('active');
-                document.querySelector('.navbar a[onclick*="home"]').classList.add('active');
-            } else if (pageName === 'rank') {
-                document.getElementById('rankPage').classList.add('active');
-                document.querySelector('.navbar a[onclick*="rank"]').classList.add('active');
-            } else if (pageName === 'help') {
-                document.getElementById('helpPage').classList.add('active');
-                document.querySelector('.navbar a[onclick*="help"]').classList.add('active');
-            } else if (pageName === 'form') {
-                document.getElementById('formPage').classList.add('active');
-            } else if (pageName === 'checkout') {
-                document.getElementById('checkoutPage').classList.add('active');
-            }
-        }
-
-        // Rank Selection
-        function selectRank(rank, price) {
-            selectedRank = rank;
-            selectedPrice = price;
-            document.querySelectorAll('.rank-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
-        }
-
-        function buyRank(rank, price) {
-            selectedRank = rank;
-            selectedPrice = price;
-            document.getElementById('rankSelect').value = rank;
-            document.getElementById('totalAmount').textContent = price.toFixed(2);
-            showPage('form');
-        }
-
-        // Form Handling
-        document.getElementById('playerName').addEventListener('input', function(e) {
-            e.target.value = e.target.value.replace(/\s+/g, '_');
-        });
-
-        document.getElementById('platform').addEventListener('change', function(e) {
-            if (e.target.value === 'bedrock') {
-                let name = document.getElementById('playerName');
-                if (!name.value.endsWith('.')) {
-                    name.value = name.value + '.';
-                }
-            }
-        });
-
-        document.getElementById('email').addEventListener('input', function(e) {
-            let value = e.target.value;
-            if (value && !value.includes('@gmail.com')) {
-                e.target.setCustomValidity('Please enter a valid Gmail address');
-            } else {
-                e.target.setCustomValidity('');
-            }
-        });
-
-        document.getElementById('rankSelect').addEventListener('change', function(e) {
-            if (e.target.value) {
-                selectedRank = e.target.value;
-                selectedPrice = 0.01;
-                document.getElementById('totalAmount').textContent = selectedPrice.toFixed(2);
-            }
-        });
-
-        document.getElementById('purchaseForm').addEventListener('submit', function(e) {
-            e.preventDefault();
             
-            let name = document.getElementById('playerName').value;
-            let platform = document.getElementById('platform').value;
-            let email = document.getElementById('email').value;
-            let promotion = document.getElementById('promotion').value || 'none';
-            let rank = document.getElementById('rankSelect').value;
-
-            if (!name || !platform || !email || !rank) {
-                alert('Please fill in all required fields');
-                return;
-            }
-
-            if (!email.endsWith('@gmail.com')) {
-                alert('Please enter a valid Gmail address');
-                return;
-            }
-
-            orderData = {
-                name: name,
-                platform: platform,
-                email: email,
-                promotion: promotion,
-                rank: rank,
-                price: selectedPrice
-            };
-
-            document.getElementById('checkoutName').textContent = name;
-            document.getElementById('checkoutPlatform').textContent = platform;
-            document.getElementById('checkoutEmail').textContent = email;
-            document.getElementById('checkoutPromotion').textContent = promotion;
-            document.getElementById('checkoutRank').textContent = rank;
-            document.getElementById('checkoutTotal').textContent = selectedPrice.toFixed(2);
-
-            showPage('checkout');
-        });
-
-        // Payment
-        function proceedToPayment() {
-            document.getElementById('paymentAmount').textContent = orderData.price.toFixed(2);
-            document.getElementById('paymentModal').classList.add('active');
+            const data = await response.json();
             
-            // Generate QR code (mock)
-            generateQRCode();
-            
-            // Start checking payment status
-            startPaymentCheck();
-        }
-
-        function generateQRCode() {
-            // Mock QR code generation
-            const qrImage = document.getElementById('qrImage');
-            qrImage.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2ZmZiIvPjx0ZXh0IHg9IjEyNSIgeT0iMTI1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwMDAiPktIUVIgQ29kZTwvdGV4dD48L3N2Zz4=';
-        }
-
-        function selectBank(bank) {
-            document.querySelectorAll('.bank-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-            
-            // In real implementation, this would fetch the actual QR code for the selected bank
-            console.log('Selected bank:', bank);
-        }
-
-        function startPaymentCheck() {
-            const statusEl = document.getElementById('paymentStatus');
-            statusEl.textContent = 'Waiting for payment...';
-            statusEl.className = 'payment-status pending';
-
-            // Mock payment check - in real implementation, this would call the backend API
-            paymentCheckInterval = setInterval(async () => {
-                try {
-                    const response = await fetch('/api/check_payment', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ order_id: orderData.order_id })
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.status === 'completed') {
-                        clearInterval(paymentCheckInterval);
-                        statusEl.textContent = 'Payment Success!';
-                        statusEl.className = 'payment-status success';
-                        
-                        setTimeout(() => {
-                            closePaymentModal();
-                            alert('Payment successful! Your rank has been activated.');
-                            showPage('home');
-                        }, 2000);
-                    }
-                } catch (error) {
-                    console.error('Payment check error:', error);
-                }
-            }, 3000);
-        }
-
-        function closePaymentModal() {
-            document.getElementById('paymentModal').classList.remove('active');
-            if (paymentCheckInterval) {
+            if (data.status === 'completed') {
                 clearInterval(paymentCheckInterval);
-            }
-        }
-
-        // Connection Check
-        async function checkConnection() {
-            try {
-                const response = await fetch('/api/health');
-                const data = await response.json();
+                statusEl.textContent = 'Payment Success!';
+                statusEl.className = 'payment-status success';
                 
-                if (data.status === 'ok') {
-                    document.getElementById('connectionStatus').className = 'connection-status success';
-                    document.getElementById('connectionStatus').textContent = 'Connected';
-                    setTimeout(() => {
-                        document.getElementById('connectionStatus').style.display = 'none';
-                    }, 3000);
-                } else {
-                    document.getElementById('connectionStatus').className = 'connection-status error';
-                    document.getElementById('connectionStatus').textContent = 'Connect to server??';
-                }
-            } catch (error) {
-                document.getElementById('connectionStatus').className = 'connection-status error';
-                document.getElementById('connectionStatus').textContent = 'Connect to server??';
+                setTimeout(() => {
+                    closePaymentModal();
+                    alert('Payment successful! Your rank has been activated.');
+                    showPage('home');
+                }, 2000);
             }
+        } catch (error) {
+            console.error('Payment check error:', error);
         }
+    }, 3000);
+}
 
-        // Check connection on load and every 30 seconds
-        checkConnection();
-        setInterval(checkConnection, 30000);
+function closePaymentModal() {
+    document.getElementById('paymentModal').classList.remove('active');
+    if (paymentCheckInterval) {
+        clearInterval(paymentCheckInterval);
+    }
+}
 
-        // Initialize
-        showPage('home');
+// Connection Check
+async function checkConnection() {
+    try {
+        const response = await fetch('/api/health');
+        const data = await response.json();
+        
+        if (data.status === 'ok') {
+            document.getElementById('connectionStatus').className = 'connection-status success';
+            document.getElementById('connectionStatus').textContent = 'Connected';
+            setTimeout(() => {
+                document.getElementById('connectionStatus').style.display = 'none';
+            }, 3000);
+        } else {
+            document.getElementById('connectionStatus').className = 'connection-status error';
+            document.getElementById('connectionStatus').textContent = 'Connect to server??';
+        }
+    } catch (error) {
+        document.getElementById('connectionStatus').className = 'connection-status error';
+        document.getElementById('connectionStatus').textContent = 'Connect to server??';
+    }
+}
+
+// Initialize
+checkConnection();
+setInterval(checkConnection, 30000);
+loadRanks(); // Load ranks on page load
+showPage('home');
     </script>
 </body>
   </html>
