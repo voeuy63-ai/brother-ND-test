@@ -1,0 +1,268 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: #0f1318;
+    color: #e2e8f0;
+    font-family: 'Poppins', 'Kantumruy Pro', sans-serif;
+}
+
+/* 🌐 Navigation Bar Style */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #161c24;
+    padding: 15px 50px;
+    border-bottom: 2px solid #2d3748;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #4caf50;
+    cursor: pointer;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 30px;
+}
+
+.nav-links a {
+    color: #a0aec0;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.nav-links a:hover {
+    color: #4caf50;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* 🏠 Store Pages System */
+.store-page {
+    display: none;
+}
+
+.store-page.active {
+    display: block;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* 📦 Home Content Style */
+.welcome-text {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.welcome-text h1 {
+    font-size: 28px;
+    color: #fff;
+    margin-bottom: 10px;
+}
+
+.home-boxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+.home-box {
+    background-color: #1a222d;
+    border-radius: 14px;
+    padding: 35px 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.home-box:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+}
+
+.box-icon { font-size: 45px; margin-bottom: 15px; }
+
+/* 🎨 តម្រូវការពណ៌ប្រអប់ទំព័រដំបូង */
+.box-views { border: 2px solid #2e7d32; }
+.box-views h3 { color: #4caf50; }
+.box-views:hover { background-color: rgba(76, 175, 80, 0.08); }
+
+.box-rank { border: 2px solid #f57f17; }
+.box-rank h3 { color: #fbc02d; }
+.box-rank:hover { background-color: rgba(251, 192, 45, 0.08); }
+
+.box-life { border: 2px solid #c62828; }
+.box-life h3 { color: #e53935; }
+.box-life:hover { background-color: rgba(229, 57, 53, 0.08); }
+
+/* 💎 Shop Multi-Step Design */
+.shop-step { display: none; }
+.shop-step.active { display: block; }
+
+h2 {
+    font-size: 20px;
+    margin-bottom: 25px;
+    color: #4caf50;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.rank-card {
+    background-color: #161c24;
+    border: 2px solid #2d3748;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.rank-card.selected {
+    border-color: #4caf50;
+    background-color: rgba(76, 175, 80, 0.05);
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.2);
+}
+
+.badge {
+    font-size: 18px;
+    font-weight: bold;
+    padding: 5px 15px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+.rank-acacia { background-color: #e65100; color: #fff; }
+.rank-azalea { background-color: #ec407a; color: #fff; }
+.rank-jungle { background-color: #2e7d32; color: #fff; }
+
+.price { font-size: 24px; font-weight: bold; margin-bottom: 10px; }
+.price .khr { display: block; font-size: 14px; color: #a0aec0; font-weight: 400; }
+.desc { font-size: 13px; color: #cbd5e0; line-height: 1.5; }
+
+/* Buttons Style */
+.btn-next, .btn-success, .btn-danger, .btn-secondary {
+    padding: 12px 30px;
+    font-size: 15px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.btn-next { background-color: #4caf50; color: #000; float: right; }
+.btn-next:hover { background-color: #66bb6a; }
+.btn-secondary { background-color: #4a5568; color: #fff; }
+.btn-danger { background-color: #e53935; color: #fff; }
+.btn-success { background-color: #4caf50; color: #000; }
+
+/* Forms & Checkout Cards */
+.form-card, .checkout-card {
+    background-color: #161c24;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 550px;
+    margin: 0 auto;
+    border: 1px solid #2d3748;
+}
+
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: #cbd5e0; }
+.form-group input, .form-group select {
+    width: 100%; padding: 12px; background-color: #0f1318;
+    border: 1px solid #2d3748; border-radius: 6px; color: #fff; font-size: 15px; outline: none;
+}
+.form-group input:focus { border-color: #4caf50; }
+.form-buttons { display: flex; justify-content: space-between; margin-top: 25px; }
+
+.checkout-details p {
+    padding: 12px 0; border-bottom: 1px dashed #2d3748;
+    display: flex; justify-content: space-between; font-size: 15px;
+}
+.text-highlight { color: #fbc02d; font-weight: bold; }
+
+/* 💵 KHQR Payment Modal Popup */
+.modal {
+    display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+    width: 100%; height: 100%; background-color: rgba(0,0,0,0.85); backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: #ffffff; color: #333; margin: 5% auto;
+    padding: 30px 25px; border-radius: 20px; width: 90%; max-width: 380px;
+    text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+}
+
+.khqr-title { color: #2e7d32; font-size: 24px; font-weight: 800; letter-spacing: 1px; margin-bottom: 2px; }
+.khqr-subtitle { color: #718096; font-size: 12px; font-weight: 600; text-transform: uppercase; margin-bottom: 20px; }
+
+.qr-container {
+    width: 210px; height: 210px; margin: 0 auto; background: #f7fafc;
+    border: 2px solid #e2e8f0; border-radius: 12px; padding: 10px;
+    display: flex; justify-content: center; align-items: center; position: relative;
+}
+
+.timeout-overlay {
+    display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(255,255,255,0.92); border-radius: 12px;
+    justify-content: center; align-items: center; color: #e53935; font-weight: bold; font-size: 15px;
+}
+
+.khqr-msg { font-size: 14px; font-weight: 600; color: #4a5568; margin-top: 15px; }
+.timer-box { background-color: #fff5f5; color: #c53030; font-size: 13px; font-weight: bold; padding: 8px; border-radius: 6px; margin: 15px 0; }
+
+.loading-status { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; color: #718096; }
+.spinner { border: 2px solid #edf2f7; border-top: 2px solid #2e7d32; border-radius: 50%; width: 14px; height: 14px; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* 🎉 Beautiful Custom Success Alert */
+.alert-modal {
+    display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+}
+.alert-modal.active { opacity: 1; pointer-events: auto; }
+
+.alert-content {
+    background-color: #1a222d; border-radius: 16px; padding: 35px 25px; text-align: center;
+    max-width: 400px; width: 85%; border: 2px solid #4caf50; transform: scale(0.8); transition: 0.3s transform ease;
+}
+.alert-modal.active .alert-content { transform: scale(1); }
+
+.alert-content h2 { color: #4caf50; font-size: 24px; margin-top: 15px; margin-bottom: 10px; }
+.alert-content p { color: #cbd5e0; font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
+.btn-alert-close { background-color: #4caf50; color: #000; font-weight: bold; padding: 10px 40px; border: none; border-radius: 6px; cursor: pointer; }
+
+/* Checkmark Animation UI */
+.success-icon-box { display: flex; justify-content: center; }
+.checkmark-circle { width: 70px; height: 70px; border-radius: 50%; border: 4px solid #4caf50; display: block; position: relative; }
+.checkmark { display: block; }
+.checkmark.draw:after { animation-duration: 800ms; animation-timing-function: ease; animation-name: checkmark; transform: scaleX(-1) rotate(135deg); }
+.checkmark:after { opacity: 1; height: 35px; width: 17px; transform-origin: left top; border-right: 4px solid #4caf50; border-top: 4px solid #4caf50; content: ''; left: 13px; top: 33px; position: absolute; }
+@keyframes checkmark { 0% { height: 0; width: 0; opacity: 1; } 20% { height: 0; width: 17px; opacity: 1; } 40% { height: 35px; width: 17px; opacity: 1; } 100% { height: 35px; width: 17px; opacity: 1; } }
